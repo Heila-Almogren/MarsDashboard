@@ -97,7 +97,7 @@ const getData = (current_rover) => {
 const setCurent = (chosen_rover) => {
 
     updateStore(store, store.set('current_rover', chosen_rover))
-    getData(chosen_rover)
+    return getData(chosen_rover)
 }
 
 
