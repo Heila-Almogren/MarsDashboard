@@ -1,10 +1,11 @@
 /* -------------------  MOBILE  --------------------- */
 
 body {
-  display: flex;
-  flex-direction: column;
-  font-family: Arial;
+  
+  font-family:'IBM 3270';
   min-height: 100vh;
+  background-color: black;
+  color: white;
 }
 
 header {
@@ -20,6 +21,49 @@ footer {
   /* footer styles */
 }
 
+
+.roversListImage {
+  height: 300px;
+  width:300px;
+  
+}
+
+.camera_image {
+  margin: 30px;
+  border-radius: 15px;
+}
+
+.gallery {
+  display: flex; 
+  flex-direction: row;
+  flex-wrap:  wrap;
+}
+
+.rover_images_gallery {
+  border: solid red;
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+  flex-wrap:  no-wrap;
+}
+
+.roverListItemContainer {
+  border: solid yellow; position: relative; width: fit-content;
+  transition: transform .2s;
+  display: grid;
+  flex-direction: row;
+}
+
+.roverListItemContainer:hover {
+  transform: scale(1.2);
+  transform-origin:center left;
+
+}
+
+.roverListLabel {
+  position: absolute; bottom: 10px; left: 10px; font-size: 40px;
+}
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
   /* use mobile */
@@ -35,4 +79,7 @@ footer {
 
 @media (min-width: 1824px) {
   /* use mobile */
+
+  
 }
+

@@ -1,14 +1,18 @@
-let store = {
+
+let store = Immutable.Map({
+
     user: { name: "Student" },
-    apod: '',
+    curiosity: '',
+    current_rover: '',
+    rover_data: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-}
+})
 
 // add our markup to the page
 const root = document.getElementById('root')
 
-const updateStore = (store, newState) => {
-    store = Object.assign(store, newState)
+const updateStore = (state, newState) => {
+    store = state.merge(newState)
     render(root, store)
 }
 
@@ -17,89 +21,185 @@ const render = async (root, state) => {
 }
 
 
-// create content
 const App = (state) => {
-    let { rovers, apod } = state
 
+    let { rovers, rover_data } = state
     return `
         <header></header>
         <main>
-            ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
-            </section>
+            
+                <h3>“Curiosity is the essence of our existence”</h3>
+                <p>Choose a rover</p>
+<div class="gallery">
+
+                ${curiosityImage()}
+                ${opportunityImage()}
+                ${spiritImage()}
+                </div>
+                <br>
+                ${getRover(state)}
         </main>
-        <footer></footer>
-    `
+        <footer></footer>`
 }
 
-// listening for load event because page should load before any JS is called
+
+
 window.addEventListener('load', () => {
     render(root, store)
 })
 
-// ------------------------------------------------------  COMPONENTS
+// ------------------------------------------------------  COMPONENTS  ------------------------------------------------------
 
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
-const Greeting = (name) => {
-    if (name) {
-        return `
-            <h1>Welcome, ${name}!</h1>
-        `
-    }
 
-    return `
-        <h1>Hello!</h1>
-    `
-}
+const getRover = (store) => {
 
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = (apod) => {
 
-    // If image does not already exist, or it is not from today -- request it again
-    const today = new Date()
-    const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
 
-    console.log(photodate.getDate() === today.getDate());
-    if (!apod || apod.date === today.getDate() ) {
-        getImageOfTheDay(store)
-    }
+    if (!store.get("rover_data")) {
+        return ''
 
-    // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
-        return (`
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `)
     } else {
-        return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `)
+
+        List = ''
+
+        info = `
+        <br>
+        <div style="display: block">
+            <p>Launch date: ${store.get("rover_data").launch_date}</p>
+            <p>Landing date: ${store.get("rover_data").landing_date}</p>
+        </div>
+            `
+        for (i = 0; i < store.get("rover_data").photos.length; i++) {
+
+            List += `<img class="camera_image" src="${store.get("rover_data").photos[i].img_src}" height="350px" />`
+        }
+        return info + `<div class="rover_images_gallery">` + List + `</div>`
     }
+
+
 }
 
-// ------------------------------------------------------  API CALLS
+const getData = (current_rover) => {
 
-// Example API call
-const getImageOfTheDay = (state) => {
-    let { apod } = state
+    switch (current_rover) {
 
-    fetch(`http://localhost:3000/apod`)
+        case 'curiosity': return getCuriosityData(store)
+        case 'Spirit': return getSpiritData(store)
+        case 'Opportunity': return getOpportunityData(store)
+        default: return
+    }
+
+}
+
+
+// ------------------------------------------------------  API CALLS ------------------------------------------------------
+
+const setCurent = (chosen_rover) => {
+
+    updateStore(store, store.set('current_rover', chosen_rover))
+    getData(chosen_rover)
+}
+
+
+const getCuriosityData = (state) => {
+    let { rover_data } = state
+
+    data = fetch(`http://localhost:3000/curiosityData`)
         .then(res => res.json())
-        .then(apod => updateStore(store, { apod }))
+        .then(res => ({
+            launch_date: res.info.photos[0].rover.launch_date,
+            landing_date: res.info.photos[0].rover.landing_date,
+            photos: res.info.photos.map(photo => ({
+                img_src: photo.img_src,
+            }))
+        }))
+        .then(rover_data => {
+            updateStore(store, store.set('rover_data', rover_data))
+        }).then(rover_data => {
+            console.log(JSON.stringify(store.get("rover_data")))
+        })
+
 
     return data
 }
+
+const getOpportunityData = (state) => {
+    let { rover_data } = state
+
+    data = fetch(`http://localhost:3000/opportunityData`)
+        .then(res => res.json())
+        .then(res => ({
+            launch_date: res.info.photos[0].rover.launch_date,
+            landing_date: res.info.photos[0].rover.landing_date,
+            photos: res.info.photos.map(photo => ({
+                img_src: photo.img_src,
+            }))
+        }))
+        .then(rover_data => {
+            updateStore(store, store.set('rover_data', rover_data))
+        })
+
+
+    return data
+}
+
+const getSpiritData = (state) => {
+    let { rover_data } = state
+
+    data = fetch(`http://localhost:3000/spiritData`)
+        .then(res => res.json())
+        .then(res => ({
+            launch_date: res.info.photos[0].rover.launch_date,
+            landing_date: res.info.photos[0].rover.landing_date,
+            photos: res.info.photos.map(photo => ({
+                img_src: photo.img_src,
+            }))
+        }))
+        .then(rover_data => {
+            updateStore(store, store.set('rover_data', rover_data))
+
+        })
+
+
+    return data
+}
+
+
+
+
+const curiosityImage = () => {
+
+    return (`
+
+<div class="roverListItemContainer">
+<p class="roverListLabel">Curiosity</p>
+<img class="roversListImage" onClick="setCurent('curiosity')" src="https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG" />
+</div>
+`)
+}
+
+
+
+
+const opportunityImage = () => {
+
+    return (`
+<div class="roverListItemContainer">
+<p class="roverListLabel">Opportunity</p>
+<img class="roversListImage" onClick="setCurent('Opportunity')" src="https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG" />
+</div>
+`)
+}
+
+const spiritImage = () => {
+
+    return (`
+<div class="roverListItemContainer">
+<p class="roverListLabel">Spirit</p>
+<img class="roversListImage" onClick="setCurent('Spirit')" src="https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG" />
+</div>
+`)
+}
+
+
+
