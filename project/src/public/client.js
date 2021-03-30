@@ -29,7 +29,7 @@ const App = (state) => {
         <main>
             
                 <h3>“Curiosity is the essence of our existence”</h3>
-                <p>Choose a rover</p>
+                <h2>Choose a rover</h2>
 <div class="gallery">
 
                 ${curiosityImage()}
@@ -67,6 +67,8 @@ const getRover = (store) => {
         <div style="display: block">
             <p>Launch date: ${store.get("rover_data").launch_date}</p>
             <p>Landing date: ${store.get("rover_data").landing_date}</p>
+            <p>Status: ${store.get("rover_data").status}</p>
+            <p>Most recent date: ${store.get("rover_data").earth_date}</p>
         </div>
             `
         for (i = 0; i < store.get("rover_data").photos.length; i++) {
@@ -107,16 +109,19 @@ const getCuriosityData = (state) => {
     data = fetch(`http://localhost:3000/curiosityData`)
         .then(res => res.json())
         .then(res => ({
-            launch_date: res.info.photos[0].rover.launch_date,
-            landing_date: res.info.photos[0].rover.landing_date,
-            photos: res.info.photos.map(photo => ({
+            launch_date: res.info.latest_photos[0].rover.launch_date,
+            landing_date: res.info.latest_photos[0].rover.landing_date,
+            status: res.info.latest_photos[0].rover.status,
+            photos: res.info.latest_photos.map(photo => ({
                 img_src: photo.img_src,
-            }))
+            })),
+            earth_date: res.info.latest_photos[0].earth_date
+
+
+
         }))
         .then(rover_data => {
             updateStore(store, store.set('rover_data', rover_data))
-        }).then(rover_data => {
-            console.log(JSON.stringify(store.get("rover_data")))
         })
 
 
@@ -129,11 +134,16 @@ const getOpportunityData = (state) => {
     data = fetch(`http://localhost:3000/opportunityData`)
         .then(res => res.json())
         .then(res => ({
-            launch_date: res.info.photos[0].rover.launch_date,
-            landing_date: res.info.photos[0].rover.landing_date,
-            photos: res.info.photos.map(photo => ({
+            launch_date: res.info.latest_photos[0].rover.launch_date,
+            landing_date: res.info.latest_photos[0].rover.landing_date,
+            status: res.info.latest_photos[0].rover.status,
+            photos: res.info.latest_photos.map(photo => ({
                 img_src: photo.img_src,
-            }))
+            })),
+            earth_date: res.info.latest_photos[0].earth_date
+
+
+
         }))
         .then(rover_data => {
             updateStore(store, store.set('rover_data', rover_data))
@@ -149,15 +159,19 @@ const getSpiritData = (state) => {
     data = fetch(`http://localhost:3000/spiritData`)
         .then(res => res.json())
         .then(res => ({
-            launch_date: res.info.photos[0].rover.launch_date,
-            landing_date: res.info.photos[0].rover.landing_date,
-            photos: res.info.photos.map(photo => ({
+            launch_date: res.info.latest_photos[0].rover.launch_date,
+            landing_date: res.info.latest_photos[0].rover.landing_date,
+            status: res.info.latest_photos[0].rover.status,
+            photos: res.info.latest_photos.map(photo => ({
                 img_src: photo.img_src,
-            }))
+            })),
+            earth_date: res.info.latest_photos[0].earth_date
+
+
+
         }))
         .then(rover_data => {
             updateStore(store, store.set('rover_data', rover_data))
-
         })
 
 

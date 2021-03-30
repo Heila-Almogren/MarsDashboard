@@ -3,9 +3,21 @@
 body {
   
   font-family:'IBM 3270';
+  
   min-height: 100vh;
   background-color: black;
   color: white;
+}
+
+h3 {
+  
+  font-size: 30px;
+}
+
+h2 {
+  
+  font-size:20px;
+  
 }
 
 header {
@@ -52,7 +64,7 @@ footer {
   border: solid yellow; position: relative; width: fit-content;
   transition: transform .2s;
   display: grid;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .roverListItemContainer:hover {
@@ -72,14 +84,24 @@ footer {
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
-  /* use mobile */
-}
 
-/* -------------------  LARGE SCREENS  -------------- */
-
-@media (min-width: 1824px) {
-  /* use mobile */
-
+  h3 {
   
-}
+    font-size:40px;
+    
+  }
 
+  h2 {
+  
+    font-size:30px;
+    
+  }
+
+
+  .roverListItemContainer {
+    border: solid yellow; position: relative; width: fit-content;
+    transition: transform .2s;
+    display: grid;
+    flex-direction: row;
+  }
+}
